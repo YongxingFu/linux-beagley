@@ -1,0 +1,97 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/media/i2c/ovti,ox03h10.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: OmniVision OX03H10 image sensor
+
+maintainers:
+  - BeagleY-AI Edge AI project
+
+description: |
+  The OX03H10 is a MIPI CSI-2 image sensor. This driver uses the BeagleY-AI
+  profile for a 1920x1536 BGGR RAW12 60 fps output over four CSI-2 lanes.
+  The board manages sensor rails and reset; the driver enables the serializer
+  reference clock while streaming.
+
+properties:
+  compatible:
+    const: ovti,ox03h10
+
+  reg:
+    maxItems: 1
+
+  clocks:
+    maxItems: 1
+
+  clock-names:
+    const: xvclk
+
+  port:
+    $ref: /schemas/graph.yaml#/$defs/port-base
+    unevaluatedProperties: false
+    description: MIPI CSI-2 output port
+
+    properties:
+      endpoint:
+        $ref: /schemas/media/video-interfaces.yaml#
+        unevaluatedProperties: false
+
+        properties:
+          data-lanes:
+            minItems: 4
+            maxItems: 4
+
+          clock-lanes:
+            maxItems: 1
+
+          lane-polarities:
+            minItems: 1
+            maxItems: 5
+
+          link-frequencies: true
+
+        required:
+          - data-lanes
+          - link-frequencies
+
+required:
+  - compatible
+  - reg
+  - clocks
+  - clock-names
+  - port
+
+additionalProperties: false
+
+examples:
+  - |
+    camera_clock: clock {
+        compatible = "fixed-clock";
+        clock-frequency = <24000000>;
+        #clock-cells = <0>;
+    };
+
+    i2c {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        camera@36 {
+            compatible = "ovti,ox03h10";
+            reg = <0x36>;
+
+            clocks = <&camera_clock>;
+            clock-names = "xvclk";
+
+
+            port {
+                camera_out: endpoint {
+                    data-lanes = <1 2 3 4>;
+                    clock-lanes = <0>;
+                    link-frequencies = /bits/ 64 <750000000>;
+                };
+            };
+        };
+    };
+...

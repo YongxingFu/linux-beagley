@@ -1,0 +1,101 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/* BeagleY-AI 40-pin adapter, YXMA023EHD panel. */
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/gpio/gpio.h>
+#include "k3-pinctrl.h"
+
+&{/} {
+	compatible = "beagle,am67a-beagley-ai";
+};
+
+&main_pmx0 {
+	yxma_pins: yxma-pins {
+		pinctrl-single,pins = <
+			J722S_IOPAD(0x088, PIN_OUTPUT, 7) /* GPIO0_33: 1V8 */
+			J722S_IOPAD(0x198, PIN_OUTPUT, 7) /* GPIO1_8: 5V */
+			J722S_IOPAD(0x1d8, PIN_INPUT, 7) /* GPIO1_24: CTRL */
+			J722S_IOPAD(0x1dc, PIN_OUTPUT, 7) /* GPIO1_25: RESET */
+			J722S_IOPAD(0x004, PIN_OUTPUT, 7) /* GPIO0_1: mux OE */
+			J722S_IOPAD(0x008, PIN_OUTPUT, 7) /* GPIO0_2: mux SEL */
+		>;
+	};
+};
+
+&main_gpio0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&yxma_pins>;
+	yxma-mux-oe-hog {
+		gpio-hog;
+		gpios = <1 GPIO_ACTIVE_HIGH>;
+		output-low;
+		line-name = "dsi-mux-oe";
+	};
+
+	yxma-mux-sel-hog {
+		gpio-hog;
+		gpios = <2 GPIO_ACTIVE_HIGH>;
+		output-low;
+		line-name = "dsi-mux-sel";
+	};
+};
+
+&main_i2c0 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&main_i2c0_pins_default>;
+	clock-frequency = <100000>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	yxma023ehd: panel@50 {
+		compatible = "yousee,yxma023ehd";
+		reg = <0x50>;
+		status = "okay";
+		enable-1v8-gpios = <&main_gpio0 33 GPIO_ACTIVE_HIGH>;
+		enable-5v-gpios = <&main_gpio1 8 GPIO_ACTIVE_HIGH>;
+		ctrl-gpios = <&main_gpio1 24 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&main_gpio1 25 GPIO_ACTIVE_LOW>;
+		port {
+			yxma023ehd_in: endpoint {
+				remote-endpoint = <&yxma023ehd_dsi_out>;
+			};
+		};
+	};
+};
+
+&dphy_tx0 {
+	status = "okay";
+};
+
+&dsi0 {
+	status = "okay";
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		port@0 {
+			reg = <0>;
+			yxma023ehd_dsi_out: endpoint {
+				remote-endpoint = <&yxma023ehd_in>;
+			};
+		};
+		port@1 {
+			reg = <1>;
+			yxma023ehd_dsi_in: endpoint {
+				remote-endpoint = <&yxma023ehd_dss_out>;
+			};
+		};
+	};
+};
+
+&dss1_ports {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	port@1 {
+		reg = <1>;
+		yxma023ehd_dss_out: endpoint {
+			remote-endpoint = <&yxma023ehd_dsi_in>;
+		};
+	};
+};
