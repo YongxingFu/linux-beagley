@@ -1753,3 +1753,12 @@ config VIDEO_MAX96717
 endmenu
 
 endif # VIDEO_DEV
+
+config VIDEO_OX08D10
+	tristate "OmniVision OX08D10 sensor (TI fixed HDR mode)"
+	depends on OF && I2C && VIDEO_DEV
+	select REGMAP_I2C
+	select V4L2_FWNODE
+	help
+	  OX08D10 direct CSI-2 sensor, fixed four-lane HDR4 PWL12 mode.
+	  The TI register data is licensed for use with TI devices only.

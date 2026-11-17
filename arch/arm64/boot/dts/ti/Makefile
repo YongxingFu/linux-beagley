@@ -617,3 +617,5 @@ dtb-$(CONFIG_ARCH_K3) += k3-am67a-beagley-ai.dtb
 dtb-$(CONFIG_ARCH_K3) += k3-am67a-beagley-ai-ox03h10-gmsl.dtbo
 dtb-$(CONFIG_ARCH_K3) += k3-am6232-pocketbeagle2.dtb
 dtb-$(CONFIG_ARCH_K3) += k3-am67a-beagley-ai-yxma023ehd.dtbo
+
+dtb-$(CONFIG_ARCH_K3) += k3-am67a-beagley-ai-ox08d10.dtbo
